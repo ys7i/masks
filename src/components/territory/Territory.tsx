@@ -2,37 +2,38 @@
 /** @jsx jsx */
 import { jsx, css } from '@emotion/react';
 import React from 'react';
-import { Mask, MaskColor, TerritoryMask } from '../../types/situation';
+import { AboutMe, Mask } from '../../types/situation';
 import Square from '../square/Square';
 
 type Props = {
-  color: MaskColor;
-  handled: TerritoryMask;
-  onClick: () => void;
+  handled: Mask[];
+  aboutMe: AboutMe;
+  onClick: (e: React.MouseEvent<HTMLElement>) => void;
 };
 
-const Territory: React.FC<Props> = ({ color, handled, onClick }) => {
-  const renderSquare = (isExist: boolean, situation: Mask[]) => {
-    if (isExist) {
-      const size = situation.findIndex((element) => element !== null);
+const Territory: React.FC<Props> = ({ handled, aboutMe, onClick }) => {
+  const renderSquare = (situation: Mask[], place: number) => {
+    const size = situation.findIndex((element) => element !== null);
+    if (size !== -1) {
       return (
         <Square
-          size={size}
-          onClick={onClick}
           situation={situation}
-          isOnBoard={false}
+          size={size}
+          place={place}
+          aboutMe={aboutMe}
+          onClick={onClick}
         />
       );
     }
   };
   return (
     <div css={territory}>
-      {renderSquare(handled.large1, [null, null, color])}
-      {renderSquare(handled.large2, [null, null, color])}
-      {renderSquare(handled.medium1, [null, color, null])}
-      {renderSquare(handled.medium2, [null, color, null])}
-      {renderSquare(handled.small1, [color, null, null])}
-      {renderSquare(handled.small2, [color, null, null])}
+      {renderSquare([null, null, handled[5]], 5)}
+      {renderSquare([null, null, handled[4]], 4)}
+      {renderSquare([null, handled[3], null], 3)}
+      {renderSquare([null, handled[2], null], 2)}
+      {renderSquare([handled[1], null, null], 1)}
+      {renderSquare([handled[0], null, null], 0)}
     </div>
   );
 };
