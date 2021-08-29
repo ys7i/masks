@@ -295,7 +295,7 @@ const Game: React.FC = () => {
   return (
     <div css={game}>
       {winner === 'red' ? (
-        <div css={turnRed}>You Win!</div>
+        <div css={turnRed}> You Win!</div>
       ) : turn === 'red' && winner === null ? (
         <div css={turnRed}>Your Turn</div>
       ) : (
