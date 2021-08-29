@@ -44,51 +44,78 @@ const Game: React.FC = () => {
   } | null>(null);
 
   const onClick = (e: React.MouseEvent<HTMLElement>): void => {
+    console.log(situation);
     const [aboutMe, place]: [AboutMe, number] = [
       e.currentTarget.dataset.me as AboutMe,
       Number(e.currentTarget.dataset.place),
     ];
-    console.log(aboutMe, place);
     if (selected === null) {
       changeToSelected(aboutMe, place);
       return;
     }
 
     switch (aboutMe) {
-      case 'onBoard':
-        {
-          const [clickedMask, clickedIndex] = findColorIndex(situation[place]); //clickされた場所
-          const selectedIndex = selectedSize();
-          console.log(clickedMask);
-          if (clickedMask === null) {
-            const copy = situation.slice();
-            copy[place][selectedIndex] = turn;
-            setSituation(copy);
-            removeSelected();
-            // nonSelected();
-            setTurn(turn === 'red' ? 'blue' : 'red');
-            return;
-          }
-          if (clickedMask === 'selectedRed' || clickedMask === 'selectedBlue') {
-            //board上かつselectedをclick
-            nonSelected();
-          }
-          if (selectedIndex > clickedIndex) {
-            const copy = situation.slice();
-            copy[place][clickedIndex] = turn;
-            setSituation(copy);
-            setTurn(turn === 'red' ? 'blue' : 'red');
-          }
-          nonSelected();
+      case 'onBoard': {
+        const [clickedMask, clickedIndex] = findColorIndex(situation[place]); //clickされた場所
+        const selectedIndex = selectedSize();
+        if (clickedMask === null) {
+          const copy = situation.slice();
+          copy[place][selectedIndex] = turn;
+          setSituation(copy);
+          removeSelected();
+          setTurn(turn === 'red' ? 'blue' : 'red');
+          return;
         }
-        break;
+        if (clickedMask === 'selectedRed' || clickedMask === 'selectedBlue') {
+          //board上かつselectedをclick
+          nonSelected();
+          removeSelected();
+          return;
+        }
+        if (selectedIndex > clickedIndex) {
+          const copy = situation.slice();
+          copy[place][selectedIndex] = turn;
+          console.log('copy', copy);
+          setSituation(copy);
+          setTurn(turn === 'red' ? 'blue' : 'red');
+          removeSelected();
+          return;
+        }
+        return;
+      }
       case 'redTerriory':
-        break;
+        if (turn === 'blue') {
+          return;
+        }
+        if (selected.aboutMe === 'redTerriory' && selected.place === place) {
+          nonSelected();
+          return;
+        }
+        {
+          nonSelected();
+          const copyRed = redMasks.slice();
+          copyRed[place] = 'selectedRed';
+          setRedMasks(copyRed);
+          return;
+        }
       case 'blueTerritory':
-        break;
+        if (turn === 'red') {
+          return;
+        }
+        if (selected.aboutMe === 'blueTerritory' && selected.place === place) {
+          nonSelected();
+          return;
+        }
+        {
+          nonSelected();
+          const copyBlue = blueMasks.slice();
+          copyBlue[place] = 'selectedBlue';
+          setBlueMasks(copyBlue);
+          return;
+        }
     }
   };
-
+  //removeSelectedとsetSelectedは同じ関数内で呼び出してはいけない
   const removeSelected = () => {
     if (selected === null) {
       return;
@@ -98,18 +125,18 @@ const Game: React.FC = () => {
       const [, index] = findColorIndex(situation[selected.place]);
       copy[selected.place][index] = null;
       setSituation(copy);
+      setSelected(null);
       return;
     }
     const territory =
       selected.aboutMe === 'redTerriory' ? redMasks.slice() : blueMasks.slice();
     territory[selected.place] = null;
     if (selected.aboutMe === 'redTerriory') {
-      console.log(territory);
       setRedMasks(territory);
-      console.log(territory);
     } else {
       setBlueMasks(territory);
     }
+    setSelected(null);
   };
 
   const nonSelected = () => {
@@ -174,7 +201,7 @@ const Game: React.FC = () => {
           const copy = blueMasks.slice();
           copy[place] = 'selectedBlue';
           setBlueMasks(copy);
-          setSelected({ aboutMe: 'redTerriory', place });
+          setSelected({ aboutMe: 'blueTerritory', place });
         }
         break;
     }
