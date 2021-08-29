@@ -66,6 +66,7 @@ const square = css`
   line-height: 1rem;
   padding: 0;
   position: relative;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 `;
 const onBoard = css`
   border: 1px solid #999;
