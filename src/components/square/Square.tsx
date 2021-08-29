@@ -79,5 +79,6 @@ const onBoard = css`
   margin-top: -1px;
   padding: 0;
   position: relative;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 `;
 export default Square;

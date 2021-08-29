@@ -2,7 +2,7 @@
 /** @jsx jsx */
 import { jsx, css } from '@emotion/react';
 import React, { useState } from 'react';
-import { useEffect } from 'react';
+// import { useEffect } from 'react';
 import { AboutMe, Mask, Situation, Turn } from '../../types/situation';
 import Board from '../board/Board';
 import Territory from '../territory/Territory';
@@ -43,11 +43,13 @@ const Game: React.FC = () => {
 
   const [winner, setWinner] = useState<Turn | null>(null);
 
-  useEffect(() => {
-    const winnerColor = caluculateWinner();
+  const judgeWinner = (copy: Situation) => {
+    const winnerColor = caluculateWinner(copy);
     if (winnerColor === null) return;
     setWinner(winnerColor);
-  }, [situation]);
+    removeSelected();
+    return;
+  };
 
   const onClick = (e: React.MouseEvent<HTMLElement>): void => {
     if (winner !== null) {
@@ -70,6 +72,7 @@ const Game: React.FC = () => {
           setSituation((state) => {
             const copy = state.slice();
             copy[place][selectedIndex] = turn;
+            judgeWinner(copy);
             return copy;
           });
           removeSelected();
@@ -86,11 +89,10 @@ const Game: React.FC = () => {
           setSituation((state) => {
             const copy = state.slice();
             copy[place][selectedIndex] = turn;
+            judgeWinner(copy);
             return copy;
           });
           setTurn(turn === 'red' ? 'blue' : 'red');
-          removeSelected();
-          return;
         }
         return;
       }
@@ -144,6 +146,7 @@ const Game: React.FC = () => {
         const copy = state.slice();
         const [, index] = findColorIndex(state[selected.place]);
         copy[selected.place][index] = null;
+        judgeWinner(copy);
         return copy;
       });
       setSelected(null);
@@ -175,6 +178,7 @@ const Game: React.FC = () => {
         const copy = state.slice();
         const [, index] = findColorIndex(situation[selected.place]);
         copy[selected.place][index] = turn;
+        judgeWinner(copy);
         return copy;
       });
       setSelected(null);
@@ -214,8 +218,9 @@ const Game: React.FC = () => {
           if (index !== -1 && color === turn) {
             setSituation((state) => {
               const copy = state.slice();
-              copy[place][index] ===
-                (color === 'red' ? 'selectedRed' : 'selectedBlue');
+              console.log(copy[place][index]);
+              copy[place][index] =
+                color === 'red' ? 'selectedRed' : 'selectedBlue';
               return copy;
             });
             setSelected({ aboutMe: 'onBoard', place });
@@ -256,11 +261,8 @@ const Game: React.FC = () => {
     return [null, -1];
   };
 
-  const caluculateWinner = (): Turn | null => {
-    const situationCopy = situation.slice();
-    if (selected !== null) {
-      return null;
-    }
+  const caluculateWinner = (copy: Situation): Turn | null => {
+    const situationCopy = copy.slice();
     const result = situationCopy.map((element) => {
       if (element[2] !== null) {
         return element[2];
