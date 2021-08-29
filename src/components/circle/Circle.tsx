@@ -7,15 +7,9 @@ import { MaskColor } from '../../types/situation';
 type Props = {
   color: MaskColor;
   size: number;
-  onClick: () => void;
 };
-const Circle: React.FC<Props> = ({ color, size, onClick }) => {
-  return (
-    <div
-      css={[circle, circleSize[size], circleColor[color]]}
-      onClick={() => onClick()}
-    ></div>
-  );
+const Circle: React.FC<Props> = ({ color, size }) => {
+  return <div css={[circle, circleSize[size], circleColor[color]]}></div>;
 };
 
 const circleColor = {
@@ -24,6 +18,12 @@ const circleColor = {
   `,
   blue: css`
     background-color: #2b51b4;
+  `,
+  selectedRed: css`
+    background-color: #5a1629;
+  `,
+  selectedBlue: css`
+    background-color: #16295a;
   `,
 };
 

@@ -16,6 +16,7 @@
   "plugins": ["react", "@typescript-eslint"],
   "rules": {
     "require-jsdoc": 0,
-    "react/prop-types": "off"
+    "react/prop-types": "off",
+    "@typescript-eslint/no-unused-vars": ["error"]
   }
 }

@@ -2,31 +2,38 @@
 /** @jsx jsx */
 import { jsx, css } from '@emotion/react';
 import React from 'react';
-import { Mask, MaskColor } from '../../types/situation';
+import { AboutMe, Mask, MaskColor } from '../../types/situation';
 import Circle from '../circle/Circle';
 
 export type Props = {
   situation: Mask[];
-  onClick: () => void;
   size: number;
-  isOnBoard?: boolean;
+  place: number;
+  aboutMe: AboutMe;
+  onClick: (e: React.MouseEvent<HTMLElement>) => void;
 };
 
 const Square: React.FC<Props> = ({
   situation,
   onClick,
   size,
-  isOnBoard = true,
+  place,
+  aboutMe,
 }) => {
   const renderCircle = (index: number) => {
     if (situation[index] !== null) {
       const color = situation[index] as MaskColor;
-      return <Circle size={index} color={color} onClick={onClick} />;
+      return <Circle color={color} size={index} />;
     }
   };
   renderCircle(0);
   return (
-    <div css={[sizeStyle[size], isOnBoard ? onBoard : square]}>
+    <div
+      css={[sizeStyle[size], aboutMe === 'onBoard' ? onBoard : square]}
+      onClick={onClick}
+      data-place={String(place)}
+      data-me={aboutMe}
+    >
       {renderCircle(0)}
       {renderCircle(1)}
       {renderCircle(2)}

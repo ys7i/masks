@@ -7,26 +7,37 @@ import Square from '../square/Square';
 
 type Props = {
   situation: Situation;
-  onClick: () => void;
+  onClick: (e: React.MouseEvent<HTMLElement>) => void;
 };
 
 const Board: React.FC<Props> = ({ situation, onClick }) => {
+  const renderBoard = (place: number) => {
+    return (
+      <Square
+        situation={situation[place]}
+        onClick={onClick}
+        size={2}
+        place={place}
+        aboutMe='onBoard'
+      />
+    );
+  };
   return (
     <div css={board}>
       <div css={boardRow}>
-        <Square situation={situation[0]} onClick={onClick} size={2} />
-        <Square situation={situation[1]} onClick={onClick} size={2} />
-        <Square situation={situation[2]} onClick={onClick} size={2} />
+        {renderBoard(0)}
+        {renderBoard(1)}
+        {renderBoard(2)}
       </div>
       <div css={boardRow}>
-        <Square situation={situation[3]} onClick={onClick} size={2} />
-        <Square situation={situation[4]} onClick={onClick} size={2} />
-        <Square situation={situation[5]} onClick={onClick} size={2} />
+        {renderBoard(3)}
+        {renderBoard(4)}
+        {renderBoard(5)}
       </div>
       <div css={boardRow}>
-        <Square situation={situation[6]} onClick={onClick} size={2} />
-        <Square situation={situation[7]} onClick={onClick} size={2} />
-        <Square situation={situation[8]} onClick={onClick} size={2} />
+        {renderBoard(6)}
+        {renderBoard(7)}
+        {renderBoard(8)}
       </div>
     </div>
   );
