@@ -323,34 +323,34 @@ const Game: React.FC = () => {
   );
 };
 const game = css`
-  margin: 125px auto;
+  margin: 75px auto;
 `;
 
 const turnRed = css`
   transform: rotate(180deg);
   background-color: #b42b51;
-  width: 250px;
-  height: 75px;
-  font-size: 50px;
+  width: 150px;
+  height: 45px;
+  font-size: 30px;
   border-radius: 50%;
-  margin: 50px auto;
+  margin: 30px auto;
   text-align: center;
   color: white;
 `;
 const none = css`
-  width: 250px;
-  height: 75px;
-  margin: 50px auto;
+  width: 150px;
+  height: 45px;
+  margin: 30px auto;
   text-align: center;
 `;
 const turnBlue = css`
   background-color: #2b51b4;
-  width: 250px;
-  height: 75px;
-  font-size: 50px;
+  width: 150px;
+  height: 45px;
+  font-size: 30px;
   border-radius: 50%;
-  margin: 50px auto;
-  margin: 25px auto;
+  margin: 30px auto;
+  margin: 15px auto;
   text-align: center;
   color: white;
 `;
