@@ -302,7 +302,7 @@ const Game: React.FC = () => {
   return (
     <div css={game}>
       {winner === 'red' ? (
-        <div css={turnRed}> You Win!</div>
+        <div css={redWin}> You Win!</div>
       ) : turn === 'red' && winner === null ? (
         <div css={turnRed}>Your Turn</div>
       ) : (
@@ -318,7 +318,7 @@ const Game: React.FC = () => {
         onClick={onClick}
       />
       {winner === 'blue' ? (
-        <div css={turnBlue}>You Win!</div>
+        <div css={blueWin}>You Win!</div>
       ) : turn === 'blue' && winner === null ? (
         <div css={turnBlue}>Your Turn</div>
       ) : (
@@ -344,6 +344,17 @@ const turnRed = css`
   text-align: center;
   color: white;
 `;
+
+const redWin = css`
+  transform: rotate(180deg);
+  color: #b42b51;
+  width: 120px;
+  height: 36px;
+  font-size: 24px;
+  margin: 24px auto;
+  text-align: center;
+  font-weight: bold;
+`;
 const none = css`
   width: 120px;
   height: 36px;
@@ -359,5 +370,15 @@ const turnBlue = css`
   margin: 24px auto;
   text-align: center;
   color: white;
+`;
+
+const blueWin = css`
+  color: #2b51b4;
+  width: 120px;
+  height: 36px;
+  font-size: 24px;
+  margin: 24px auto;
+  text-align: center;
+  font-weight: bold;
 `;
 export default Game;
