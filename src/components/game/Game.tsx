@@ -82,7 +82,6 @@ const Game: React.FC = () => {
         if (clickedMask === 'selectedRed' || clickedMask === 'selectedBlue') {
           //board上かつselectedをclick
           nonSelected();
-          removeSelected();
           return;
         }
         if (selectedIndex > clickedIndex) {
@@ -92,48 +91,53 @@ const Game: React.FC = () => {
             judgeWinner(copy);
             return copy;
           });
+          removeSelected();
           setTurn(turn === 'red' ? 'blue' : 'red');
         }
         return;
       }
       case 'redTerriory':
-        if (turn === 'blue') {
+        if (turn === 'blue' || selected.aboutMe === 'onBoard') {
           return;
         }
         if (selected.aboutMe === 'redTerriory' && selected.place === place) {
           nonSelected();
           return;
         }
-        {
+        if (selected.aboutMe === 'redTerriory' && selected.place !== place) {
           nonSelected();
-          setRedMasks((state) => {
-            const copy = state.slice();
-            copy[place] = 'selectedRed';
-            return copy;
-          });
-          setSelected({ aboutMe: 'redTerriory', place: place });
+          if (redMasks[place] === 'red') {
+            setRedMasks((state) => {
+              const copy = state.slice();
+              copy[place] = 'selectedRed';
+              return copy;
+            });
+            setSelected({ aboutMe: 'redTerriory', place: place });
+          }
           return;
         }
+        return;
       case 'blueTerritory':
-        if (turn === 'red') {
+        if (turn === 'red' || selected.aboutMe === 'onBoard') {
           return;
         }
         if (selected.aboutMe === 'blueTerritory' && selected.place === place) {
           nonSelected();
           return;
         }
-        {
+        if (selected.aboutMe === 'blueTerritory' && selected.place !== place) {
           nonSelected();
-          const copyBlue = blueMasks.slice();
-          copyBlue[place] = 'selectedBlue';
-          setBlueMasks((state) => {
-            const copy = state.slice();
-            copy[place] = 'selectedBlue';
-            return copy;
-          });
-          setSelected({ aboutMe: 'blueTerritory', place: place });
+          if (blueMasks[place] === 'blue') {
+            setBlueMasks((state) => {
+              const copy = state.slice();
+              copy[place] = 'selectedBlue';
+              return copy;
+            });
+            setSelected({ aboutMe: 'blueTerritory', place: place });
+          }
           return;
         }
+        return;
     }
   };
   //removeSelectedとsetSelectedは同じ関数内で呼び出してはいけない
@@ -182,6 +186,7 @@ const Game: React.FC = () => {
         return copy;
       });
       setSelected(null);
+      return;
     }
     if (selected.aboutMe === 'redTerriory') {
       setRedMasks((state) => {
@@ -323,34 +328,35 @@ const Game: React.FC = () => {
   );
 };
 const game = css`
-  margin: 75px auto;
+  margin: 0 auto;
+  display: grid;
+  place-items: center;
 `;
 
 const turnRed = css`
   transform: rotate(180deg);
   background-color: #b42b51;
-  width: 150px;
-  height: 45px;
-  font-size: 30px;
+  width: 120px;
+  height: 36px;
+  font-size: 24px;
   border-radius: 50%;
-  margin: 30px auto;
+  margin: 24px auto;
   text-align: center;
   color: white;
 `;
 const none = css`
-  width: 150px;
-  height: 45px;
-  margin: 30px auto;
+  width: 120px;
+  height: 36px;
+  margin: 24px auto;
   text-align: center;
 `;
 const turnBlue = css`
   background-color: #2b51b4;
-  width: 150px;
-  height: 45px;
-  font-size: 30px;
+  width: 120px;
+  height: 36px;
+  font-size: 24px;
   border-radius: 50%;
-  margin: 30px auto;
-  margin: 15px auto;
+  margin: 24px auto;
   text-align: center;
   color: white;
 `;
