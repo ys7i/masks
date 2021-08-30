@@ -39,10 +39,10 @@ const Territory: React.FC<Props> = ({ handled, aboutMe, onClick }) => {
 };
 
 const territory = css`
-  width: 30rem;
-  height: 7rem;
+  width: 750px;
+  height: 175px;
   border: solid 1px black;
-  margin: 1rem auto;
+  margin: 25px auto;
   display: flex;
 `;
 

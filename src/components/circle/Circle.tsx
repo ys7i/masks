@@ -29,18 +29,18 @@ const circleColor = {
 
 const circleSize = [
   css`
-    width: 2rem;
-    height: 2rem;
+    width: 50px;
+    height: 50px;
     opacity: 0.9;
   `,
   css`
-    width: 4rem;
-    height: 4rem;
+    width: 100px;
+    height: 100px;
     opacity: 0.7;
   `,
   css`
-    width: 6rem;
-    height: 6rem;
+    width: 150px;
+    height: 150px;
     opacity: 0.5;
   `,
 ];

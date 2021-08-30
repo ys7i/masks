@@ -43,27 +43,27 @@ const Square: React.FC<Props> = ({
 
 const sizeStyle = [
   css`
-    height: 3rem;
-    width: 3rem;
-    margin: 2rem 0;
+    height: 75px;
+    width: 75px;
+    margin: 50px 0;
   `,
   css`
-    height: 5rem;
-    width: 5rem;
-    margin: 1rem 0;
+    height: 125px;
+    width: 125px;
+    margin: 25px 0;
   `,
   css`
-    height: 7rem;
-    width: 7rem;
+    height: 175px;
+    width: 175px;
   `,
 ];
 
 const square = css`
   background: #fff;
   float: left;
-  font-size: 1rem;
+  font-size: 25px;
   font-weight: bold;
-  line-height: 1rem;
+  line-height: 25px;
   padding: 0;
   position: relative;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
@@ -72,9 +72,9 @@ const onBoard = css`
   border: 1px solid #999;
   background: #fff;
   float: left;
-  font-size: 1rem;
+  font-size: 25px;
   font-weight: bold;
-  line-height: 1rem;
+  line-height: 25px;
   margin-right: -1px;
   margin-top: -1px;
   padding: 0;
