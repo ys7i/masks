@@ -2,13 +2,11 @@
 /** @jsx jsx */
 import { jsx, css } from '@emotion/react';
 import React, { useState } from 'react';
+// import { useEffect } from 'react';
 import { AboutMe, Mask, Situation, Turn } from '../../types/situation';
 import Board from '../board/Board';
 import Territory from '../territory/Territory';
 
-const game = css`
-  margin: 5rem auto;
-`;
 const Game: React.FC = () => {
   const [situation, setSituation] = useState<Situation>([
     [null, null, null],
@@ -43,8 +41,61 @@ const Game: React.FC = () => {
     place: number;
   } | null>(null);
 
+  const [winner, setWinner] = useState<Turn | null>(null);
+
+  const judgeWinner = (copy: Situation) => {
+    const winnerColor = caluculateWinner(copy);
+    if (winnerColor === null) return;
+    setWinner(winnerColor);
+    removeSelected();
+    return;
+  };
+
+  const changeToSelected = (aboutMe: AboutMe, place: number): void => {
+    switch (aboutMe) {
+      case 'onBoard':
+        {
+          const [color, index] = findColorIndex(situation[place]);
+          if (index !== -1 && color === turn) {
+            setSituation((state) => {
+              const copy = state.slice();
+              copy[place][index] =
+                color === 'red' ? 'selectedRed' : 'selectedBlue';
+              return copy;
+            });
+            setSelected({ aboutMe: 'onBoard', place });
+          }
+        }
+        return;
+
+      case 'redTerriory':
+        if (redMasks[place] === turn) {
+          setRedMasks((state) => {
+            const copy = state.slice();
+            copy[place] = 'selectedRed';
+            return copy;
+          });
+          setSelected({ aboutMe: 'redTerriory', place });
+        }
+        return;
+
+      case 'blueTerritory':
+        if (blueMasks[place] === turn) {
+          setBlueMasks((state) => {
+            const copy = state.slice();
+            copy[place] = 'selectedBlue';
+            return copy;
+          });
+          setSelected({ aboutMe: 'blueTerritory', place });
+        }
+        return;
+    }
+  };
+
   const onClick = (e: React.MouseEvent<HTMLElement>): void => {
-    console.log(situation);
+    if (winner !== null) {
+      return;
+    }
     const [aboutMe, place]: [AboutMe, number] = [
       e.currentTarget.dataset.me as AboutMe,
       Number(e.currentTarget.dataset.place),
@@ -53,15 +104,26 @@ const Game: React.FC = () => {
       changeToSelected(aboutMe, place);
       return;
     }
+    changeToUnselected(aboutMe, place);
+    return;
+  };
 
+  const changeToUnselected = (aboutMe: AboutMe, place: number): void => {
+    if (selected === null) {
+      console.error('One piece must be selected');
+      throw new Error();
+    }
     switch (aboutMe) {
       case 'onBoard': {
         const [clickedMask, clickedIndex] = findColorIndex(situation[place]); //clickされた場所
         const selectedIndex = selectedSize();
         if (clickedMask === null) {
-          const copy = situation.slice();
-          copy[place][selectedIndex] = turn;
-          setSituation(copy);
+          setSituation((state) => {
+            const copy = state.slice();
+            copy[place][selectedIndex] = turn;
+            judgeWinner(copy);
+            return copy;
+          });
           removeSelected();
           setTurn(turn === 'red' ? 'blue' : 'red');
           return;
@@ -69,72 +131,121 @@ const Game: React.FC = () => {
         if (clickedMask === 'selectedRed' || clickedMask === 'selectedBlue') {
           //board上かつselectedをclick
           nonSelected();
-          removeSelected();
           return;
         }
         if (selectedIndex > clickedIndex) {
-          const copy = situation.slice();
-          copy[place][selectedIndex] = turn;
-          console.log('copy', copy);
-          setSituation(copy);
-          setTurn(turn === 'red' ? 'blue' : 'red');
+          setSituation((state) => {
+            const copy = state.slice();
+            copy[place][selectedIndex] = turn;
+            judgeWinner(copy);
+            return copy;
+          });
           removeSelected();
+          setTurn(turn === 'red' ? 'blue' : 'red');
           return;
+        }
+        if (
+          (selected.aboutMe === 'redTerriory' ||
+            selected.aboutMe === 'blueTerritory') &&
+          clickedMask === turn
+        ) {
+          nonSelected();
+          changeToSelected('onBoard', place);
         }
         return;
       }
       case 'redTerriory':
         if (turn === 'blue') {
           return;
-        }
-        if (selected.aboutMe === 'redTerriory' && selected.place === place) {
-          nonSelected();
+        } else {
+          if (selected.aboutMe === 'redTerriory' && selected.place === place) {
+            nonSelected();
+            return;
+          }
+          if (selected.aboutMe === 'redTerriory' && selected.place !== place) {
+            nonSelected();
+            if (redMasks[place] === 'red') {
+              setRedMasks((state) => {
+                const copy = state.slice();
+                copy[place] = 'selectedRed';
+                return copy;
+              });
+              setSelected({ aboutMe: 'redTerriory', place: place });
+            }
+            return;
+          }
+          if (selected.aboutMe === 'onBoard') {
+            nonSelected();
+            changeToSelected('redTerriory', place);
+            return;
+          }
           return;
         }
-        {
-          nonSelected();
-          const copyRed = redMasks.slice();
-          copyRed[place] = 'selectedRed';
-          setRedMasks(copyRed);
-          return;
-        }
+
       case 'blueTerritory':
         if (turn === 'red') {
           return;
-        }
-        if (selected.aboutMe === 'blueTerritory' && selected.place === place) {
-          nonSelected();
-          return;
-        }
-        {
-          nonSelected();
-          const copyBlue = blueMasks.slice();
-          copyBlue[place] = 'selectedBlue';
-          setBlueMasks(copyBlue);
-          return;
+        } else {
+          //turn === 'blue'
+          if (
+            selected.aboutMe === 'blueTerritory' &&
+            selected.place === place
+          ) {
+            nonSelected();
+            return;
+          }
+          if (
+            selected.aboutMe === 'blueTerritory' &&
+            selected.place !== place
+          ) {
+            nonSelected();
+            if (blueMasks[place] === 'blue') {
+              setBlueMasks((state) => {
+                const copy = state.slice();
+                copy[place] = 'selectedBlue';
+                return copy;
+              });
+              setSelected({ aboutMe: 'blueTerritory', place: place });
+            }
+            return;
+          }
+          if (selected.aboutMe === 'onBoard') {
+            nonSelected();
+            changeToSelected('blueTerritory', place);
+            return;
+          }
         }
     }
   };
-  //removeSelectedとsetSelectedは同じ関数内で呼び出してはいけない
+  //removeSelectedとsetSelectedはどちらか片方
   const removeSelected = () => {
     if (selected === null) {
       return;
     }
     if (selected.aboutMe === 'onBoard') {
-      const copy = situation.slice();
-      const [, index] = findColorIndex(situation[selected.place]);
-      copy[selected.place][index] = null;
-      setSituation(copy);
+      setSituation((state) => {
+        const copy = state.slice();
+        const [, index] = findColorIndex(state[selected.place]);
+        copy[selected.place][index] = null;
+        judgeWinner(copy);
+        return copy;
+      });
       setSelected(null);
       return;
     }
-    const territory =
-      selected.aboutMe === 'redTerriory' ? redMasks.slice() : blueMasks.slice();
-    territory[selected.place] = null;
+
     if (selected.aboutMe === 'redTerriory') {
-      setRedMasks(territory);
+      setRedMasks((state) => {
+        const copy = state.slice();
+        copy[selected.place] = null;
+        return copy;
+      });
     } else {
-      setBlueMasks(territory);
+      setBlueMasks((state) => {
+        const copy = state.slice();
+        copy[selected.place] = null;
+        return copy;
+      });
     }
     setSelected(null);
   };
@@ -144,19 +255,28 @@ const Game: React.FC = () => {
       return;
     }
     if (selected.aboutMe === 'onBoard') {
-      const copy = situation.slice();
-      const [, index] = findColorIndex(situation[selected.place]);
-      copy[selected.place][index] = turn;
-      setSituation(copy);
+      setSituation((state) => {
+        const copy = state.slice();
+        const [, index] = findColorIndex(situation[selected.place]);
+        copy[selected.place][index] = turn;
+        judgeWinner(copy);
+        return copy;
+      });
       setSelected(null);
+      return;
     }
-    const territory =
-      selected.aboutMe === 'redTerriory' ? redMasks.slice() : blueMasks.slice();
-    territory[selected.place] = turn;
     if (selected.aboutMe === 'redTerriory') {
-      setRedMasks(territory);
+      setRedMasks((state) => {
+        const copy = state.slice();
+        copy[selected.place] = turn;
+        return copy;
+      });
     } else {
-      setBlueMasks(territory);
+      setBlueMasks((state) => {
+        const copy = state.slice();
+        copy[selected.place] = turn;
+        return copy;
+      });
     }
     setSelected(null);
   };
@@ -172,41 +292,6 @@ const Game: React.FC = () => {
     return Math.floor(selected.place / 2);
   };
 
-  const changeToSelected = (aboutMe: AboutMe, place: number): void => {
-    switch (aboutMe) {
-      case 'onBoard':
-        {
-          const [color, index] = findColorIndex(situation[place]);
-          if (index !== -1 && color === turn) {
-            const copy = situation.slice();
-            copy[place][index] ===
-              (color === 'red' ? 'selectedRed' : 'selectedBlue');
-            setSituation(copy);
-            setSelected({ aboutMe: 'onBoard', place });
-          }
-        }
-        break;
-
-      case 'redTerriory':
-        if (redMasks[place] === turn) {
-          const copy = redMasks.slice();
-          copy[place] = 'selectedRed';
-          setRedMasks(copy);
-          setSelected({ aboutMe: 'redTerriory', place });
-        }
-        break;
-
-      case 'blueTerritory':
-        if (blueMasks[place] === turn) {
-          const copy = blueMasks.slice();
-          copy[place] = 'selectedBlue';
-          setBlueMasks(copy);
-          setSelected({ aboutMe: 'blueTerritory', place });
-        }
-        break;
-    }
-  };
-
   const findColorIndex = (mask: Mask[]): [Mask, number] => {
     for (let i = 2; i > -1; i--) {
       if (mask[i] !== null) {
@@ -216,9 +301,48 @@ const Game: React.FC = () => {
     return [null, -1];
   };
 
+  const caluculateWinner = (copy: Situation): Turn | null => {
+    const situationCopy = copy.slice();
+    const result = situationCopy.map((element) => {
+      if (element[2] !== null) {
+        return element[2];
+      }
+      if (element[1] !== null) {
+        return element[1];
+      }
+      if (element[0] !== null) {
+        return element[0];
+      }
+      return null;
+    });
+    const lines = [
+      [0, 1, 2],
+      [3, 4, 5],
+      [6, 7, 8],
+      [0, 3, 6],
+      [1, 4, 7],
+      [2, 5, 8],
+      [0, 4, 8],
+      [2, 4, 6],
+    ];
+    for (let i = 0; i < lines.length; i++) {
+      const [a, b, c] = lines[i];
+      if (result[a] && result[a] === result[b] && result[a] === result[c]) {
+        return result[a] as Turn;
+      }
+    }
+    return null;
+  };
+
   return (
     <div css={game}>
-      <p>{turn}</p>
+      {winner === 'red' ? (
+        <div css={redWin}> You Win!</div>
+      ) : turn === 'red' && winner === null ? (
+        <div css={turnRed}>Your Turn</div>
+      ) : (
+        <div css={none}></div>
+      )}
       <Territory handled={redMasks} aboutMe='redTerriory' onClick={onClick} />
       <div>
         <Board situation={situation} onClick={onClick} />
@@ -228,8 +352,68 @@ const Game: React.FC = () => {
         aboutMe='blueTerritory'
         onClick={onClick}
       />
+      {winner === 'blue' ? (
+        <div css={blueWin}>You Win!</div>
+      ) : turn === 'blue' && winner === null ? (
+        <div css={turnBlue}>Your Turn</div>
+      ) : (
+        <div css={none}></div>
+      )}
     </div>
   );
 };
+const game = css`
+  margin: 0 auto;
+  display: grid;
+  place-items: center;
+`;
 
+const turnRed = css`
+  transform: rotate(180deg);
+  background-color: #b42b51;
+  width: 120px;
+  height: 36px;
+  font-size: 24px;
+  border-radius: 50%;
+  margin: 24px auto;
+  text-align: center;
+  color: white;
+`;
+
+const redWin = css`
+  transform: rotate(180deg);
+  color: #b42b51;
+  width: 120px;
+  height: 36px;
+  font-size: 24px;
+  margin: 24px auto;
+  text-align: center;
+  font-weight: bold;
+`;
+const none = css`
+  width: 120px;
+  height: 36px;
+  margin: 24px auto;
+  text-align: center;
+`;
+const turnBlue = css`
+  background-color: #2b51b4;
+  width: 120px;
+  height: 36px;
+  font-size: 24px;
+  border-radius: 50%;
+  margin: 24px auto;
+  text-align: center;
+  color: white;
+`;
+
+const blueWin = css`
+  color: #2b51b4;
+  width: 120px;
+  height: 36px;
+  font-size: 24px;
+  margin: 24px auto;
+  text-align: center;
+  font-weight: bold;
+`;
 export default Game;
