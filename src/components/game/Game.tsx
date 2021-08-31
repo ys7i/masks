@@ -51,6 +51,47 @@ const Game: React.FC = () => {
     return;
   };
 
+  const changeToSelected = (aboutMe: AboutMe, place: number): void => {
+    switch (aboutMe) {
+      case 'onBoard':
+        {
+          const [color, index] = findColorIndex(situation[place]);
+          if (index !== -1 && color === turn) {
+            setSituation((state) => {
+              const copy = state.slice();
+              copy[place][index] =
+                color === 'red' ? 'selectedRed' : 'selectedBlue';
+              return copy;
+            });
+            setSelected({ aboutMe: 'onBoard', place });
+          }
+        }
+        return;
+
+      case 'redTerriory':
+        if (redMasks[place] === turn) {
+          setRedMasks((state) => {
+            const copy = state.slice();
+            copy[place] = 'selectedRed';
+            return copy;
+          });
+          setSelected({ aboutMe: 'redTerriory', place });
+        }
+        return;
+
+      case 'blueTerritory':
+        if (blueMasks[place] === turn) {
+          setBlueMasks((state) => {
+            const copy = state.slice();
+            copy[place] = 'selectedBlue';
+            return copy;
+          });
+          setSelected({ aboutMe: 'blueTerritory', place });
+        }
+        return;
+    }
+  };
+
   const onClick = (e: React.MouseEvent<HTMLElement>): void => {
     if (winner !== null) {
       return;
@@ -63,7 +104,15 @@ const Game: React.FC = () => {
       changeToSelected(aboutMe, place);
       return;
     }
+    changeToUnselected(aboutMe, place);
+    return;
+  };
 
+  const changeToUnselected = (aboutMe: AboutMe, place: number): void => {
+    if (selected === null) {
+      console.error('One piece must be selected');
+      throw new Error();
+    }
     switch (aboutMe) {
       case 'onBoard': {
         const [clickedMask, clickedIndex] = findColorIndex(situation[place]); //clickされた場所
@@ -93,54 +142,82 @@ const Game: React.FC = () => {
           });
           removeSelected();
           setTurn(turn === 'red' ? 'blue' : 'red');
+          return;
+        }
+        if (
+          (selected.aboutMe === 'redTerriory' ||
+            selected.aboutMe === 'blueTerritory') &&
+          clickedMask === turn
+        ) {
+          nonSelected();
+          changeToSelected('onBoard', place);
         }
         return;
       }
       case 'redTerriory':
-        if (turn === 'blue' || selected.aboutMe === 'onBoard') {
+        if (turn === 'blue') {
           return;
-        }
-        if (selected.aboutMe === 'redTerriory' && selected.place === place) {
-          nonSelected();
-          return;
-        }
-        if (selected.aboutMe === 'redTerriory' && selected.place !== place) {
-          nonSelected();
-          if (redMasks[place] === 'red') {
-            setRedMasks((state) => {
-              const copy = state.slice();
-              copy[place] = 'selectedRed';
-              return copy;
-            });
-            setSelected({ aboutMe: 'redTerriory', place: place });
+        } else {
+          if (selected.aboutMe === 'redTerriory' && selected.place === place) {
+            nonSelected();
+            return;
+          }
+          if (selected.aboutMe === 'redTerriory' && selected.place !== place) {
+            nonSelected();
+            if (redMasks[place] === 'red') {
+              setRedMasks((state) => {
+                const copy = state.slice();
+                copy[place] = 'selectedRed';
+                return copy;
+              });
+              setSelected({ aboutMe: 'redTerriory', place: place });
+            }
+            return;
+          }
+          if (selected.aboutMe === 'onBoard') {
+            nonSelected();
+            changeToSelected('redTerriory', place);
+            return;
           }
           return;
         }
-        return;
+
       case 'blueTerritory':
-        if (turn === 'red' || selected.aboutMe === 'onBoard') {
+        if (turn === 'red') {
           return;
-        }
-        if (selected.aboutMe === 'blueTerritory' && selected.place === place) {
-          nonSelected();
-          return;
-        }
-        if (selected.aboutMe === 'blueTerritory' && selected.place !== place) {
-          nonSelected();
-          if (blueMasks[place] === 'blue') {
-            setBlueMasks((state) => {
-              const copy = state.slice();
-              copy[place] = 'selectedBlue';
-              return copy;
-            });
-            setSelected({ aboutMe: 'blueTerritory', place: place });
+        } else {
+          //turn === 'blue'
+          if (
+            selected.aboutMe === 'blueTerritory' &&
+            selected.place === place
+          ) {
+            nonSelected();
+            return;
           }
-          return;
+          if (
+            selected.aboutMe === 'blueTerritory' &&
+            selected.place !== place
+          ) {
+            nonSelected();
+            if (blueMasks[place] === 'blue') {
+              setBlueMasks((state) => {
+                const copy = state.slice();
+                copy[place] = 'selectedBlue';
+                return copy;
+              });
+              setSelected({ aboutMe: 'blueTerritory', place: place });
+            }
+            return;
+          }
+          if (selected.aboutMe === 'onBoard') {
+            nonSelected();
+            changeToSelected('blueTerritory', place);
+            return;
+          }
         }
-        return;
     }
   };
-  //removeSelectedとsetSelectedは同じ関数内で呼び出してはいけない
+  //removeSelectedとsetSelectedはどちらか片方
   const removeSelected = () => {
     if (selected === null) {
       return;
@@ -213,48 +290,6 @@ const Game: React.FC = () => {
       return index;
     }
     return Math.floor(selected.place / 2);
-  };
-
-  const changeToSelected = (aboutMe: AboutMe, place: number): void => {
-    switch (aboutMe) {
-      case 'onBoard':
-        {
-          const [color, index] = findColorIndex(situation[place]);
-          if (index !== -1 && color === turn) {
-            setSituation((state) => {
-              const copy = state.slice();
-              console.log(copy[place][index]);
-              copy[place][index] =
-                color === 'red' ? 'selectedRed' : 'selectedBlue';
-              return copy;
-            });
-            setSelected({ aboutMe: 'onBoard', place });
-          }
-        }
-        break;
-
-      case 'redTerriory':
-        if (redMasks[place] === turn) {
-          setRedMasks((state) => {
-            const copy = state.slice();
-            copy[place] = 'selectedRed';
-            return copy;
-          });
-          setSelected({ aboutMe: 'redTerriory', place });
-        }
-        break;
-
-      case 'blueTerritory':
-        if (blueMasks[place] === turn) {
-          setBlueMasks((state) => {
-            const copy = state.slice();
-            copy[place] = 'selectedBlue';
-            return copy;
-          });
-          setSelected({ aboutMe: 'blueTerritory', place });
-        }
-        break;
-    }
   };
 
   const findColorIndex = (mask: Mask[]): [Mask, number] => {
