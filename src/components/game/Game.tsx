@@ -9,8 +9,8 @@ import Board from '../board/Board';
 
 const Game: React.FC = () => {
   const [situation, setSituation] = useState<Situation>([
-    ['red', null, null],
-    ['red', null, null],
+    [null, null, null],
+    [null, null, null],
     [null, null, null],
     [null, null, null],
     [null, null, null],
