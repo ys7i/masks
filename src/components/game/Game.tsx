@@ -43,11 +43,10 @@ const Game: React.FC = () => {
 
   const [winner, setWinner] = useState<Turn | null>(null);
 
-  const judgeWinner = (copy: Situation) => {
+  const judgeWinner = (copy: Situation): void => {
     const winnerColor = caluculateWinner(copy);
     if (winnerColor === null) return;
     setWinner(winnerColor);
-    removeSelected();
     return;
   };
 
@@ -225,10 +224,11 @@ const Game: React.FC = () => {
     if (selected.aboutMe === 'onBoard') {
       setSituation((state) => {
         const copy = state.slice();
-        const [, index] = findColorIndex(state[selected.place]);
-        copy[selected.place][index] = null;
-        judgeWinner(copy);
-        return copy;
+        const [color, index] = findColorIndex(state[selected.place]);
+        if (color === 'selectedRed' || color === 'selectedBlue') {
+          copy[selected.place][index] = null;
+        }
+        return state;
       });
       setSelected(null);
       return;
@@ -259,7 +259,6 @@ const Game: React.FC = () => {
         const copy = state.slice();
         const [, index] = findColorIndex(situation[selected.place]);
         copy[selected.place][index] = turn;
-        judgeWinner(copy);
         return copy;
       });
       setSelected(null);
@@ -295,7 +294,9 @@ const Game: React.FC = () => {
   const findColorIndex = (mask: Mask[]): [Mask, number] => {
     for (let i = 2; i > -1; i--) {
       if (mask[i] !== null) {
-        return [mask[i] as Turn, i];
+        console.log(mask[i]);
+        console.log(i);
+        return [mask[i], i];
       }
     }
     return [null, -1];
@@ -325,15 +326,18 @@ const Game: React.FC = () => {
       [0, 4, 8],
       [2, 4, 6],
     ];
+    let win = null;
     for (let i = 0; i < lines.length; i++) {
       const [a, b, c] = lines[i];
       if (result[a] && result[a] === result[b] && result[a] === result[c]) {
-        return result[a] as Turn;
+        if (win !== null) {
+          return turn === 'red' ? 'blue' : 'red';
+        }
+        win = result[a] as Turn;
       }
     }
-    return null;
+    return win;
   };
-
   return (
     <div css={game}>
       {winner === 'red' ? (
