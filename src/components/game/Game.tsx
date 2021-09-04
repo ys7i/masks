@@ -1,16 +1,16 @@
 /** @jsxRuntime classic */
 /** @jsx jsx */
 import { jsx, css } from '@emotion/react';
+import { Canvas } from '@react-three/fiber';
 import React, { useState } from 'react';
-// import { useEffect } from 'react';
 import { AboutMe, Mask, Situation, Turn } from '../../types/situation';
 import Board from '../board/Board';
-import Territory from '../territory/Territory';
+// import Territory from '../territory/Territory';
 
 const Game: React.FC = () => {
   const [situation, setSituation] = useState<Situation>([
-    [null, null, null],
-    [null, null, null],
+    ['red', null, null],
+    ['red', null, null],
     [null, null, null],
     [null, null, null],
     [null, null, null],
@@ -46,7 +46,12 @@ const Game: React.FC = () => {
   const judgeWinner = (copy: Situation) => {
     const winnerColor = caluculateWinner(copy);
     if (winnerColor === null) return;
-    setWinner(winnerColor);
+    setWinner((winner) => {
+      if (winner !== null) {
+        return turn === 'red' ? 'blue' : 'red';
+      }
+      return winnerColor;
+    });
     removeSelected();
     return;
   };
@@ -343,15 +348,22 @@ const Game: React.FC = () => {
       ) : (
         <div css={none}></div>
       )}
-      <Territory handled={redMasks} aboutMe='redTerriory' onClick={onClick} />
-      <div>
+      <Canvas
+        css={canvas}
+        camera={{ fov: 75, near: 0.1, far: 1000, position: [1, 1, 1] }}
+        style={{ height: 1000, width: 1000 }}
+      >
+        <axesHelper position={[0, 0.3, 0]} />
+        <ambientLight intensity={0.1} />
+        <directionalLight position={[2, 2, 0]} />
+        {/* <Territory handled={redMasks} aboutMe='redTerriory' onClick={onClick} /> */}
         <Board situation={situation} onClick={onClick} />
-      </div>
-      <Territory
-        handled={blueMasks}
-        aboutMe='blueTerritory'
-        onClick={onClick}
-      />
+        {/* <Territory
+          handled={blueMasks}
+          aboutMe='blueTerritory'
+          onClick={onClick}
+        /> */}
+      </Canvas>
       {winner === 'blue' ? (
         <div css={blueWin}>You Win!</div>
       ) : turn === 'blue' && winner === null ? (
@@ -415,5 +427,9 @@ const blueWin = css`
   margin: 24px auto;
   text-align: center;
   font-weight: bold;
+`;
+
+const canvas = css`
+  height: 300px;
 `;
 export default Game;
