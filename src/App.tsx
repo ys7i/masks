@@ -14,5 +14,7 @@ const App: React.FC = () => {
 
 export default App;
 const app = css`
-  background-color: #000;
+  width: max(100%, 1000px);
+  height: 1200px;
+  padding-top: 80px;
 `;

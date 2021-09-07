@@ -3,9 +3,16 @@
 import { jsx, css } from '@emotion/react';
 import { Canvas } from '@react-three/fiber';
 import React, { useState } from 'react';
+import BlueTurn from '../../model/BlueTurn';
+import RedTurn from '../../model/RedTurn';
 import { AboutMe, Mask, Situation, Turn } from '../../types/situation';
 import Board from '../board/Board';
 import Territory from '../territory/Territory';
+import Ring from '../../model/Ring';
+import RedWin from '../../model/RedWin';
+import RedRing from '../../model/RedRing';
+import BlueRing from '../../model/BlueRing';
+import BlueWin from '../../model/BlueWin';
 
 const Game: React.FC = () => {
   const [situation, setSituation] = useState<Situation>([
@@ -46,13 +53,7 @@ const Game: React.FC = () => {
   const judgeWinner = (copy: Situation): void => {
     const winnerColor = caluculateWinner(copy);
     if (winnerColor === null) return;
-    setWinner((status) => {
-      if (status !== null) {
-        return turn === 'red' ? 'blue' : 'red';
-      }
-      return winnerColor;
-    });
-    removeSelected();
+    setWinner(winnerColor);
     return;
   };
 
@@ -341,26 +342,29 @@ const Game: React.FC = () => {
   };
   return (
     <div css={game}>
-      {winner === 'red' ? (
-        <div css={redWin}> You Win!</div>
-      ) : turn === 'red' && winner === null ? (
-        <div css={turnRed}>Your Turn</div>
-      ) : (
-        <div css={none}></div>
-      )}
       <Canvas
-        css={canvas}
         camera={{
           fov: 75,
           near: 0.1,
           far: 1000,
-          position: [0, 2.5, 0],
+          position: [0, 2.9, 0],
         }}
         style={{ height: 1000, width: 1000 }}
       >
-        <axesHelper position={[0, 0.3, 0]} />
-        <ambientLight intensity={0.1} color='lightblue' />
-        <directionalLight position={[2, 2, 0]} color='lightblue' />
+        <ambientLight intensity={0.1} />
+        <directionalLight position={[-2, 2, -2.3]} intensity={0.2} />
+        <directionalLight position={[2, 2, 2.0]} intensity={0.6} />
+        {winner === 'red' ? (
+          <React.Suspense fallback={null}>
+            <RedWin />
+            <RedRing position={[0, 0, -1.7]} />
+          </React.Suspense>
+        ) : turn === 'red' && winner === null ? (
+          <React.Suspense fallback={null}>
+            <RedTurn />
+            <Ring position={[0, 0, -1.7]} />
+          </React.Suspense>
+        ) : null}
         <Territory
           handled={redMasks}
           aboutMe='redTerritory'
@@ -372,14 +376,18 @@ const Game: React.FC = () => {
           aboutMe='blueTerritory'
           clickMethod={onClick}
         />
+        {winner === 'blue' ? (
+          <React.Suspense fallback={null}>
+            <BlueWin />
+            <BlueRing position={[0, 0, 1.8]} />
+          </React.Suspense>
+        ) : turn === 'blue' && winner === null ? (
+          <React.Suspense fallback={null}>
+            <BlueTurn />
+            <Ring position={[0, 0, 1.8]} />
+          </React.Suspense>
+        ) : null}
       </Canvas>
-      {winner === 'blue' ? (
-        <div css={blueWin}>You Win!</div>
-      ) : turn === 'blue' && winner === null ? (
-        <div css={turnBlue}>Your Turn</div>
-      ) : (
-        <div css={none}></div>
-      )}
     </div>
   );
 };
@@ -389,56 +397,4 @@ const game = css`
   place-items: center;
 `;
 
-const turnRed = css`
-  transform: rotate(180deg);
-  background-color: #b42b51;
-  width: 120px;
-  height: 36px;
-  font-size: 24px;
-  border-radius: 50%;
-  margin: 24px auto;
-  text-align: center;
-  color: white;
-`;
-
-const redWin = css`
-  transform: rotate(180deg);
-  color: #b42b51;
-  width: 120px;
-  height: 36px;
-  font-size: 24px;
-  margin: 0 auto;
-  text-align: center;
-  font-weight: bold;
-`;
-const none = css`
-  width: 120px;
-  height: 36px;
-  margin: 24px auto;
-  text-align: center;
-`;
-const turnBlue = css`
-  background-color: #2b51b4;
-  width: 120px;
-  height: 36px;
-  font-size: 24px;
-  border-radius: 50%;
-  margin: 24px auto;
-  text-align: center;
-  color: white;
-`;
-
-const blueWin = css`
-  color: #2b51b4;
-  width: 120px;
-  height: 36px;
-  font-size: 24px;
-  margin: 24px auto;
-  text-align: center;
-  font-weight: bold;
-`;
-
-const canvas = css`
-  height: 300px;
-`;
 export default Game;
