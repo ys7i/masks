@@ -5,7 +5,7 @@ import { Canvas } from '@react-three/fiber';
 import React, { useState } from 'react';
 import { AboutMe, Mask, Situation, Turn } from '../../types/situation';
 import Board from '../board/Board';
-// import Territory from '../territory/Territory';
+import Territory from '../territory/Territory';
 
 const Game: React.FC = () => {
   const [situation, setSituation] = useState<Situation>([
@@ -73,14 +73,14 @@ const Game: React.FC = () => {
         }
         return;
 
-      case 'redTerriory':
+      case 'redTerritory':
         if (redMasks[place] === turn) {
           setRedMasks((state) => {
             const copy = state.slice();
             copy[place] = 'selectedRed';
             return copy;
           });
-          setSelected({ aboutMe: 'redTerriory', place });
+          setSelected({ aboutMe: 'redTerritory', place });
         }
         return;
 
@@ -97,14 +97,11 @@ const Game: React.FC = () => {
     }
   };
 
-  const onClick = (e: React.MouseEvent<HTMLElement>): void => {
+  const onClick = (aboutMe: AboutMe, place: number): void => {
+    console.log('test');
     if (winner !== null) {
       return;
     }
-    const [aboutMe, place]: [AboutMe, number] = [
-      e.currentTarget.dataset.me as AboutMe,
-      Number(e.currentTarget.dataset.place),
-    ];
     if (selected === null) {
       changeToSelected(aboutMe, place);
       return;
@@ -150,7 +147,7 @@ const Game: React.FC = () => {
           return;
         }
         if (
-          (selected.aboutMe === 'redTerriory' ||
+          (selected.aboutMe === 'redTerritory' ||
             selected.aboutMe === 'blueTerritory') &&
           clickedMask === turn
         ) {
@@ -159,15 +156,15 @@ const Game: React.FC = () => {
         }
         return;
       }
-      case 'redTerriory':
+      case 'redTerritory':
         if (turn === 'blue') {
           return;
         } else {
-          if (selected.aboutMe === 'redTerriory' && selected.place === place) {
+          if (selected.aboutMe === 'redTerritory' && selected.place === place) {
             nonSelected();
             return;
           }
-          if (selected.aboutMe === 'redTerriory' && selected.place !== place) {
+          if (selected.aboutMe === 'redTerritory' && selected.place !== place) {
             nonSelected();
             if (redMasks[place] === 'red') {
               setRedMasks((state) => {
@@ -175,13 +172,13 @@ const Game: React.FC = () => {
                 copy[place] = 'selectedRed';
                 return copy;
               });
-              setSelected({ aboutMe: 'redTerriory', place: place });
+              setSelected({ aboutMe: 'redTerritory', place: place });
             }
             return;
           }
           if (selected.aboutMe === 'onBoard') {
             nonSelected();
-            changeToSelected('redTerriory', place);
+            changeToSelected('redTerritory', place);
             return;
           }
           return;
@@ -240,7 +237,7 @@ const Game: React.FC = () => {
       return;
     }
 
-    if (selected.aboutMe === 'redTerriory') {
+    if (selected.aboutMe === 'redTerritory') {
       setRedMasks((state) => {
         const copy = state.slice();
         copy[selected.place] = null;
@@ -270,7 +267,7 @@ const Game: React.FC = () => {
       setSelected(null);
       return;
     }
-    if (selected.aboutMe === 'redTerriory') {
+    if (selected.aboutMe === 'redTerritory') {
       setRedMasks((state) => {
         const copy = state.slice();
         copy[selected.place] = turn;
@@ -300,8 +297,6 @@ const Game: React.FC = () => {
   const findColorIndex = (mask: Mask[]): [Mask, number] => {
     for (let i = 2; i > -1; i--) {
       if (mask[i] !== null) {
-        console.log(mask[i]);
-        console.log(i);
         return [mask[i], i];
       }
     }
@@ -355,19 +350,28 @@ const Game: React.FC = () => {
       )}
       <Canvas
         css={canvas}
-        camera={{ fov: 75, near: 0.1, far: 1000, position: [1, 1, 1] }}
+        camera={{
+          fov: 75,
+          near: 0.1,
+          far: 1000,
+          position: [0, 2.5, 0],
+        }}
         style={{ height: 1000, width: 1000 }}
       >
         <axesHelper position={[0, 0.3, 0]} />
-        <ambientLight intensity={0.1} />
-        <directionalLight position={[2, 2, 0]} />
-        {/* <Territory handled={redMasks} aboutMe='redTerriory' onClick={onClick} /> */}
-        <Board situation={situation} onClick={onClick} />
-        {/* <Territory
+        <ambientLight intensity={0.1} color='lightblue' />
+        <directionalLight position={[2, 2, 0]} color='lightblue' />
+        <Territory
+          handled={redMasks}
+          aboutMe='redTerritory'
+          clickMethod={onClick}
+        />
+        <Board situation={situation} clickMethod={onClick} />
+        <Territory
           handled={blueMasks}
           aboutMe='blueTerritory'
-          onClick={onClick}
-        /> */}
+          clickMethod={onClick}
+        />
       </Canvas>
       {winner === 'blue' ? (
         <div css={blueWin}>You Win!</div>
@@ -403,7 +407,7 @@ const redWin = css`
   width: 120px;
   height: 36px;
   font-size: 24px;
-  margin: 24px auto;
+  margin: 0 auto;
   text-align: center;
   font-weight: bold;
 `;

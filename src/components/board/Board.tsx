@@ -4,45 +4,52 @@ import { jsx } from '@emotion/react';
 // import { useLoader } from '@react-three/fiber';
 import React from 'react';
 // import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-import { Situation } from '../../types/situation';
+import { AboutMe, Situation } from '../../types/situation';
 import Square from '../square/Square';
 
 type Props = {
   situation: Situation;
-  onClick: (e: React.MouseEvent<HTMLElement>) => void;
+  clickMethod: (aboutMe: AboutMe, place: number) => void;
 };
 
-const Board: React.FC<Props> = ({ situation, onClick }) => {
-  const renderBoard = (place: number) => {
+const location = [
+  [-0.65, 0, -0.65],
+  [0, 0, -0.65],
+  [0.65, 0, -0.65],
+  [-0.65, 0, 0],
+  [0, 0, 0],
+  [0.65, 0, 0],
+  [-0.65, 0, 0.65],
+  [0, 0, 0.65],
+  [0.65, 0, 0.65],
+];
+
+const Board: React.FC<Props> = ({ situation, clickMethod }) => {
+  const renderSquare = (place: number) => {
     return (
       <Square
         situation={situation[place]}
-        onClick={onClick}
-        size={2}
+        clickMethod={clickMethod}
         place={place}
         aboutMe='onBoard'
+        position={location[place]}
       />
     );
   };
 
-  return <React.Suspense fallback={null}>{renderBoard(0)}</React.Suspense>;
-  // <div css={board}>
-  //   <div css={boardRow}>
-  //     {renderBoard(0)}
-  //     {renderBoard(1)}
-  //     {renderBoard(2)}
-  //   </div>
-  //   <div css={boardRow}>
-  //     {renderBoard(3)}
-  //     {renderBoard(4)}
-  //     {renderBoard(5)}
-  //   </div>
-  //   <div css={boardRow}>
-  //     {renderBoard(6)}
-  //     {renderBoard(7)}
-  //     {renderBoard(8)}
-  //   </div>
-  // </div>
+  return (
+    <React.Suspense fallback={null}>
+      {renderSquare(0)}
+      {renderSquare(1)}
+      {renderSquare(2)}
+      {renderSquare(3)}
+      {renderSquare(4)}
+      {renderSquare(5)}
+      {renderSquare(6)}
+      {renderSquare(7)}
+      {renderSquare(8)}
+    </React.Suspense>
+  );
 };
 
 // const boardRow = css`
