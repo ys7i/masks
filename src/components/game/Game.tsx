@@ -333,14 +333,10 @@ const Game: React.FC = () => {
       [2, 4, 6],
     ];
     let win = null;
-    console.log(situationCopy);
-    console.log(result);
     for (let i = 0; i < lines.length; i++) {
-      console.log(win, i);
       const [a, b, c] = lines[i];
       if (result[a] && result[a] === result[b] && result[a] === result[c]) {
         if (win !== null) {
-          console.log(win);
           return turn === 'red' ? 'blue' : 'red';
         }
         win = result[a] as Turn;
