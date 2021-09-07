@@ -19,7 +19,7 @@ type GLTFResult = GLTF & {
 };
 
 // eslint-disable-next-line no-undef
-export default function Model(props: JSX.IntrinsicElements['group']) {
+export default function RedRing(props: JSX.IntrinsicElements['group']) {
   const group = useRef<THREE.Group>({} as Group);
   useFrame(() => {
     group.current.rotation.x += 0.01;
