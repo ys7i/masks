@@ -99,7 +99,6 @@ const Game: React.FC = () => {
   };
 
   const onClick = (aboutMe: AboutMe, place: number): void => {
-    console.log('test');
     if (winner !== null) {
       return;
     }
@@ -122,12 +121,12 @@ const Game: React.FC = () => {
         const selectedIndex = selectedSize();
         if (clickedMask === null) {
           setSituation((state) => {
-            const copy = state.slice();
+            let copy = state.slice();
             copy[place][selectedIndex] = turn;
+            copy = removeSelectedBoard(copy);
             judgeWinner(copy);
             return copy;
           });
-          removeSelected();
           setTurn(turn === 'red' ? 'blue' : 'red');
           return;
         }
@@ -138,12 +137,12 @@ const Game: React.FC = () => {
         }
         if (selectedIndex > clickedIndex) {
           setSituation((state) => {
-            const copy = state.slice();
+            let copy = state.slice();
             copy[place][selectedIndex] = turn;
+            copy = removeSelectedBoard(copy);
             judgeWinner(copy);
             return copy;
           });
-          removeSelected();
           setTurn(turn === 'red' ? 'blue' : 'red');
           return;
         }
@@ -220,38 +219,43 @@ const Game: React.FC = () => {
         }
     }
   };
+
   //removeSelectedとsetSelectedはどちらか片方
-  const removeSelected = () => {
+  const removeSelectedBoard = (copy: Situation): Situation => {
+    if (selected === null) {
+      return copy;
+    }
+    if (selected.aboutMe === 'onBoard') {
+      const [color, index] = findColorIndex(copy[selected.place]);
+      if (color === 'selectedRed' || color === 'selectedBlue') {
+        copy[selected.place][index] = null;
+      }
+      setSelected(null);
+      return copy;
+    }
+    removeSelectedTerritory();
+    return copy;
+  };
+
+  const removeSelectedTerritory = () => {
     if (selected === null) {
       return;
     }
-    if (selected.aboutMe === 'onBoard') {
-      setSituation((state) => {
-        const copy = state.slice();
-        const [color, index] = findColorIndex(state[selected.place]);
-        if (color === 'selectedRed' || color === 'selectedBlue') {
-          copy[selected.place][index] = null;
-        }
-        return state;
-      });
-      setSelected(null);
-      return;
-    }
-
     if (selected.aboutMe === 'redTerritory') {
       setRedMasks((state) => {
         const copy = state.slice();
         copy[selected.place] = null;
+        setSelected(null);
         return copy;
       });
     } else {
       setBlueMasks((state) => {
         const copy = state.slice();
         copy[selected.place] = null;
+        setSelected(null);
         return copy;
       });
     }
-    setSelected(null);
   };
 
   const nonSelected = () => {
@@ -329,10 +333,14 @@ const Game: React.FC = () => {
       [2, 4, 6],
     ];
     let win = null;
+    console.log(situationCopy);
+    console.log(result);
     for (let i = 0; i < lines.length; i++) {
+      console.log(win, i);
       const [a, b, c] = lines[i];
       if (result[a] && result[a] === result[b] && result[a] === result[c]) {
         if (win !== null) {
+          console.log(win);
           return turn === 'red' ? 'blue' : 'red';
         }
         win = result[a] as Turn;
