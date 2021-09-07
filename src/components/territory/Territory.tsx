@@ -8,33 +8,50 @@ import Square from '../square/Square';
 type Props = {
   handled: Mask[];
   aboutMe: AboutMe;
-  onClick: (e: React.MouseEvent<HTMLElement>) => void;
+  clickMethod: (aboutMe: AboutMe, place: number) => void;
 };
 
-const Territory: React.FC<Props> = ({ handled, aboutMe, onClick }) => {
-  const renderSquare = (situation: Mask[], place: number, size: number) => {
-    // const size = situation.findIndex((element) => element !== null);
-    // if (size !== -1) {
+const location = {
+  redTerritory: [
+    [-1, 0, -1.25],
+    [-0.6, 0, -1.25],
+    [-0.2, 0, -1.25],
+    [0.2, 0, -1.25],
+    [0.6, 0, -1.25],
+    [1, 0, -1.25],
+  ],
+  blueTerritory: [
+    [1, 0, 1.25],
+    [0.6, 0, 1.25],
+    [0.2, 0, 1.25],
+    [-0.2, 0, 1.25],
+    [-0.6, 0, 1.25],
+    [-1, 0, 1.25],
+  ],
+  onBoard: [],
+};
+
+const Territory: React.FC<Props> = ({ handled, aboutMe, clickMethod }) => {
+  const renderSquare = (situation: Mask[], place: number) => {
     return (
       <Square
         situation={situation}
-        size={size}
         place={place}
+        clickMethod={clickMethod}
         aboutMe={aboutMe}
-        onClick={onClick}
+        position={location[aboutMe][place]}
       />
     );
-    // }
   };
   return (
-    <div css={territory}>
-      {renderSquare([null, null, handled[5]], 5, 2)}
-      {renderSquare([null, null, handled[4]], 4, 2)}
-      {renderSquare([null, handled[3], null], 3, 1)}
-      {renderSquare([null, handled[2], null], 2, 1)}
-      {renderSquare([handled[1], null, null], 1, 0)}
-      {renderSquare([handled[0], null, null], 0, 0)}
-    </div>
+    <React.Suspense fallback={null}>
+      {renderSquare([null, null, handled[5]], 5)}
+      {renderSquare([null, null, handled[4]], 4)}
+      {renderSquare([null, handled[3], null], 3)}
+      {renderSquare([null, handled[2], null], 2)}
+      {renderSquare([handled[1], null, null], 1)}
+      {renderSquare([handled[0], null, null], 0)}
+    </React.Suspense>
   );
 };
 
