@@ -351,9 +351,9 @@ const Game: React.FC = () => {
           fov: 75,
           near: 0.1,
           far: 1000,
-          position: [0, 2.9, 0],
+          position: [0, 4.0, 0],
         }}
-        style={{ height: 1000, width: 1000 }}
+        // style={{ height: 610, width: 360 }}
       >
         <ambientLight intensity={0.1} />
         <directionalLight position={[-2, 2, -2.3]} intensity={0.2} />
@@ -399,6 +399,8 @@ const game = css`
   margin: 0 auto;
   display: grid;
   place-items: center;
+  width: max(360px, 100%);
+  height: max(610px, 100%);
 `;
 
 export default Game;
