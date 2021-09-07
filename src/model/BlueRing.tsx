@@ -24,7 +24,7 @@ export default function BlueRing(props: JSX.IntrinsicElements['group']) {
   useFrame(() => {
     group.current.rotation.x += 0.01;
   });
-  const { nodes, materials } = useGLTF('/blueRing.gltf') as GLTFResult;
+  const { nodes, materials } = useGLTF('/BlueRing.gltf') as GLTFResult;
   return (
     <group ref={group} {...props} dispose={null}>
       <mesh
@@ -38,4 +38,4 @@ export default function BlueRing(props: JSX.IntrinsicElements['group']) {
   );
 }
 
-useGLTF.preload('/blueRing.gltf');
+useGLTF.preload('/BlueRing.gltf');
