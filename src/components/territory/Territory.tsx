@@ -55,12 +55,4 @@ const Territory: React.FC<Props> = ({ handled, aboutMe, clickMethod }) => {
   );
 };
 
-const territory = css`
-  width: 360px;
-  height: 84px;
-  border: solid 1px black;
-  margin: 12px auto;
-  display: flex;
-`;
-
 export default Territory;
