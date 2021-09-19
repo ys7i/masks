@@ -57,6 +57,39 @@ const Game: React.FC = () => {
     return;
   };
 
+  const resetGame = () => {
+    setSituation([
+      [null, null, null],
+      [null, null, null],
+      [null, null, null],
+      [null, null, null],
+      [null, null, null],
+      [null, null, null],
+      [null, null, null],
+      [null, null, null],
+      [null, null, null],
+    ])
+    setTurn('red')
+    setRedMasks([
+      'red',
+      'red',
+      'red',
+      'red',
+      'red',
+      'red',
+    ])
+    setBlueMasks([
+      'blue',
+      'blue',
+      'blue',
+      'blue',
+      'blue',
+      'blue',
+    ])
+    setWinner(null)
+    setSelected(null)
+  }
+
   const changeToSelected = (aboutMe: AboutMe, place: number): void => {
     switch (aboutMe) {
       case 'onBoard':
@@ -360,8 +393,8 @@ const Game: React.FC = () => {
         <directionalLight position={[2, 2, 2.0]} intensity={0.6} />
         {winner === 'red' ? (
           <React.Suspense fallback={null}>
-            <RedWin />
-            <RedRing position={[0, 0, -1.7]} />
+            <RedWin onClick={resetGame}/>
+            <RedRing position={[0, 0, -1.7]} onClick={resetGame} />
           </React.Suspense>
         ) : turn === 'red' && winner === null ? (
           <React.Suspense fallback={null}>
@@ -382,12 +415,12 @@ const Game: React.FC = () => {
         />
         {winner === 'blue' ? (
           <React.Suspense fallback={null}>
-            <BlueWin />
-            <BlueRing position={[0, 0, 1.8]} />
+            <BlueWin onClick={resetGame}/>
+            <BlueRing onClick={resetGame} position={[0, 0, 1.8]} />
           </React.Suspense>
         ) : turn === 'blue' && winner === null ? (
           <React.Suspense fallback={null}>
-            <BlueTurn />
+              <BlueTurn />
             <Ring position={[0, 0, 1.8]} />
           </React.Suspense>
         ) : null}
