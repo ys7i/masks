@@ -10,30 +10,27 @@ import { Turn } from '../types/situation'
 
 type GLTFResult = GLTF & {
   nodes: {
-    Red002: THREE.Mesh
-  }
-  materials: {
-    ['Material.006']: THREE.MeshStandardMaterial
+    Red001: THREE.Mesh
   }
 }
 
 // eslint-disable-next-line no-undef
-export default function redTurn(props: JSX.IntrinsicElements['group'] & {color: Turn}) {
+export default function Model(props: JSX.IntrinsicElements['group'] & { color: Turn}) {
   const group = useRef<THREE.Group>()
-  const { nodes, materials } = useGLTF('/redTurn.glb') as GLTFResult
+  const { nodes } = useGLTF('/win.glb') as GLTFResult
   return (
     <group ref={group} {...props} dispose={null}>
       <mesh
         castShadow
         receiveShadow
-        geometry={nodes.Red002.geometry}
-        material={materials['Material.006']}
-        material-color={props.color === 'red' ? 0xff0000 : 0x0000ff}
-        scale={0.09}
-        rotation={ props.color === 'red' ? [0, Math.PI, 0] : [0, 0, 0]}
+        geometry={nodes.Red001.geometry}
+        material={props.color === 'red' ? new THREE.MeshStandardMaterial({ color: 0xFF0000 }) : new THREE.MeshStandardMaterial({ color: 0x0000FF })}
+        // position={[-10.1, -3.01, -18.03]}
+        rotation={ props.color==='red' ? [0, Math.PI, 0]: [0, 0, 0] }
+        scale={0.08}
       />
     </group>
   )
 }
 
-useGLTF.preload('/redTurn.glb')
+useGLTF.preload('/win.glb')

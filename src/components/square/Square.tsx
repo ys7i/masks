@@ -30,7 +30,7 @@ const Square: React.FC<Props> = ({
   return (
     <React.Suspense fallback={null}>
       <SquareModel
-        position={position}
+        position={[position[0], position[1], position[2]]}
         scale={aboutMe === 'onBoard' ? 0.0128 : 0.008}
         clickMethod={clickMethod}
         place={String(place)}

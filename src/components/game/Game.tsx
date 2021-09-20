@@ -3,16 +3,12 @@
 import { jsx, css } from '@emotion/react';
 import { Canvas } from '@react-three/fiber';
 import React, { useState } from 'react';
-import BlueTurn from '../../model/BlueTurn';
 import RedTurn from '../../model/RedTurn';
 import { AboutMe, Mask, Situation, Turn } from '../../types/situation';
 import Board from '../board/Board';
 import Territory from '../territory/Territory';
 import Ring from '../../model/Ring';
-import RedWin from '../../model/RedWin';
-import RedRing from '../../model/RedRing';
-import BlueRing from '../../model/BlueRing';
-import BlueWin from '../../model/BlueWin';
+import Win from '../../model/Win';
 
 const Game: React.FC = () => {
   const [situation, setSituation] = useState<Situation>([
@@ -388,18 +384,19 @@ const Game: React.FC = () => {
         }}
         // style={{ height: 610, width: 360 }}
       >
+        <axesHelper/>
         <ambientLight intensity={0.1} />
-        <directionalLight position={[-2, 2, -2.3]} intensity={0.2} />
+        <directionalLight position={[-2, 2, -2.1]} intensity={0.2} />
         <directionalLight position={[2, 2, 2.0]} intensity={0.6} />
         {winner === 'red' ? (
           <React.Suspense fallback={null}>
-            <RedWin onClick={resetGame}/>
-            <RedRing position={[0, 0, -1.7]} onClick={resetGame} />
+            <Win onClick={resetGame} color='red' position={[0.4, 0, -1.7]}/>
+            <Ring position={[0, 0, -1.7]} onClick={resetGame} color='red' scale={ 0.45 }/>
           </React.Suspense>
         ) : turn === 'red' && winner === null ? (
           <React.Suspense fallback={null}>
-            <RedTurn />
-            <Ring position={[0, 0, -1.7]} />
+              <RedTurn color='red' position={[0.4, 0, -1.7]}/>
+              <Ring position={[0, 0, -1.7]} scale={ 0.45 } color='silver'/>
           </React.Suspense>
         ) : null}
         <Territory
@@ -415,13 +412,13 @@ const Game: React.FC = () => {
         />
         {winner === 'blue' ? (
           <React.Suspense fallback={null}>
-            <BlueWin onClick={resetGame}/>
-            <BlueRing onClick={resetGame} position={[0, 0, 1.8]} />
+            <Win onClick={resetGame} color='blue' position={[-0.35, 0, 1.85]} scale={ 0.9}/>
+            <Ring onClick={resetGame} position={[0, 0, 1.8]} color='blue'  scale={ 0.45 } />
           </React.Suspense>
         ) : turn === 'blue' && winner === null ? (
           <React.Suspense fallback={null}>
-              <BlueTurn />
-            <Ring position={[0, 0, 1.8]} />
+              <RedTurn color='blue' position={[-0.4, 0, 1.8]}/>
+              <Ring position={[0, 0, 1.8]} scale={ 0.45 } color='silver' />
           </React.Suspense>
         ) : null}
       </Canvas>

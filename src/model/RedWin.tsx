@@ -6,6 +6,7 @@ import * as THREE from 'three';
 import React, { useRef } from 'react';
 import { useGLTF } from '@react-three/drei';
 import { GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
+import { Turn } from '../types/situation';
 
 type GLTFResult = GLTF & {
   nodes: {
@@ -17,7 +18,7 @@ type GLTFResult = GLTF & {
 };
 
 // eslint-disable-next-line no-undef
-export default function Model(props: JSX.IntrinsicElements['group']) {
+export default function Model(props: JSX.IntrinsicElements['group'] & {color: Turn}) {
   const group = useRef<THREE.Group>();
   const { nodes, materials } = useGLTF('/redWin.gltf') as GLTFResult;
   return (
@@ -29,7 +30,8 @@ export default function Model(props: JSX.IntrinsicElements['group']) {
         material={materials['Material.008']}
         scale={0.07}
         position={[0.3, 0, -1.7]}
-        rotation={[0, Math.PI, 0]}
+        rotation={props.color === 'red'? [0, Math.PI, 0] : [0, 0, 0]}
+        material-color={props.color === 'red' ? 0xff0000 : 0x0000ff}
       />
     </group>
   );
