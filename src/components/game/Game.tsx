@@ -384,7 +384,6 @@ const Game: React.FC = () => {
         }}
         // style={{ height: 610, width: 360 }}
       >
-        <axesHelper/>
         <ambientLight intensity={0.1} />
         <directionalLight position={[-2, 2, -2.1]} intensity={0.2} />
         <directionalLight position={[2, 2, 2.0]} intensity={0.6} />
