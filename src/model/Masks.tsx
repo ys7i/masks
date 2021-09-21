@@ -18,7 +18,7 @@ type GLTFResult = GLTF & {
 // eslint-disable-next-line no-undef
 export default function Mask(props: JSX.IntrinsicElements['group'] & {color: Turn}) {
   const group = useRef<THREE.Group>()
-  const { nodes } = useGLTF('/Masks.glb') as GLTFResult
+  const { nodes } = useGLTF('/masks.glb') as GLTFResult
   return (
     <group ref={group} {...props} dispose={null}>
       <mesh
@@ -34,4 +34,4 @@ export default function Mask(props: JSX.IntrinsicElements['group'] & {color: Tur
   )
 }
 
-useGLTF.preload('/Masks.glb')
+useGLTF.preload('/masks.glb')
